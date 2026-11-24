@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Balance — Intentional Tech & Digital Well-being</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Tone.js for gentle chime on timer/breathing completion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        sage: {
+                            50: '#f4f7f5',
+                            100: '#e3ebe6',
+                            200: '#c6d8ce',
+                            300: '#9ebcad',
+                            400: '#749b87',
+                            500: '#547e69',
+                            600: '#416453',
+                            700: '#355043',
+                            800: '#2c4137',
+                            900: '#25362e',
+                        },
+                        sand: {
+                            50: '#fcfbf9',
+                            100: '#f7f4ee',
+                            200: '#ede6d8',
+                            300: '#dfd2bc',
+                            400: '#ceb898',
+                            500: '#be9f78',
+                        },
+                        slatecalm: {
+                            50: '#f5f7fa',
+                            100: '#eaeff4',
+                            200: '#d0dce7',
+                            300: '#a7bfd3',
+                            400: '#779cba',
+                            500: '#567ea2',
+                            600: '#436487',
+                            700: '#37516e',
+                            800: '#30455c',
+                            900: '#2b3b4e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom subtle animations & print rules */
+        body {
+            background-color: #fcfbf9;
+            color: #2c4137;
+            overflow-x: hidden;
+        }
+
+        .page-view {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Breathing Circle Animation Transitions */
+        .breathing-orb {
+            transition: transform 4s ease-in-out, background-color 1.5s ease, box-shadow 1.5s ease;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f7f4ee;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c6d8ce;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ebcad;
+        }
+
+        /* Print styling for Weekend Detox Plan */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-detox-plan, #printable-detox-plan * {
+                visibility: visible;
+            }
+            #printable-detox-plan {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none !important;
+                border: 1px solid #c6d8ce !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-sage-200 selection:text-sage-900 min-h-screen flex flex-col">
+
+    <!-- Toast Notification Container (Replaces alert()) -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-sand-50/90 backdrop-blur-md border-b border-sage-200/70 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Brand Logo -->
+                <button onclick="navigateTo('home')" class="flex items-center gap-3 text-left group focus:outline-none">
+                    <div class="w-10 h-10 rounded-2xl bg-sage-500 text-white flex items-center justify-center shadow-sm group-hover:bg-sage-600 transition-colors">
+                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke-opacity="0.3"/>
+                            <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"/>
+                            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="font-display font-bold text-xl tracking-tight text-sage-900 block leading-none">Digital Balance</span>
+                        <span class="text-xs text-sage-600 font-medium tracking-wide">Mindful Tech Living</span>
+                    </div>
+                </button>
+
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden md:flex items-center gap-2 bg-sand-100/80 p-1.5 rounded-2xl border border-sage-200/60">
+                    <button onclick="navigateTo('home')" data-nav="home" class="nav-link px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 bg-white text-sage-800 shadow-sm">
+                        Home
+                    </button>
+                    <button onclick="navigateTo('habits')" data-nav="habits" class="nav-link px-4 py-2 rounded-xl text-sm font-medium text-sage-700 hover:text-sage-900 hover:bg-white/60 transition-all duration-200">
+                        Screen Time & Habits
+                    </button>
+                    <button onclick="navigateTo('focus')" data-nav="focus" class="nav-link px-4 py-2 rounded-xl text-sm font-medium text-sage-700 hover:text-sage-900 hover:bg-white/60 transition-all duration-200">
+                        Focus & Mindfulness
+                    </button>
+                    <button onclick="navigateTo('detox')" data-nav="detox" class="nav-link px-4 py-2 rounded-xl text-sm font-medium text-sage-700 hover:text-sage-900 hover:bg-white/60 transition-all duration-200">
+                        Detox Planner & Quiz
+                    </button>
+                </nav>
+
+                <!-- Quick Action CTA (Desktop) -->
+                <div class="hidden lg:flex items-center gap-3">
+                    <button onclick="navigateTo('focus')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slatecalm-600 hover:bg-slatecalm-700 text-white text-sm font-medium shadow-sm transition-all">
+                        <i data-lucide="timer" class="w-4 h-4"></i>
+                        <span>Start Focus Session</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-xl text-sage-800 hover:bg-sage-100 focus:outline-none" aria-label="Toggle Menu">
+                    <i data-lucide="menu" id="mobile-menu-icon" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-sand-50 border-b border-sage-200 px-4 pt-2 pb-5 space-y-1.5 shadow-lg">
+            <button onclick="navigateTo('home'); toggleMobileMenu()" data-nav-mobile="home" class="mobile-nav-link w-full text-left px-4 py-3 rounded-xl text-base font-medium bg-sage-100 text-sage-900 flex items-center gap-3">
+                <i data-lucide="home" class="w-5 h-5 text-sage-600"></i> Home
+            </button>
+            <button onclick="navigateTo('habits'); toggleMobileMenu()" data-nav-mobile="habits" class="mobile-nav-link w-full text-left px-4 py-3 rounded-xl text-base font-medium text-sage-700 hover:bg-sage-50 flex items-center gap-3">
+                <i data-lucide="smartphone-off" class="w-5 h-5 text-sage-600"></i> Screen Time & Habits
+            </button>
+            <button onclick="navigateTo('focus'); toggleMobileMenu()" data-nav-mobile="focus" class="mobile-nav-link w-full text-left px-4 py-3 rounded-xl text-base font-medium text-sage-700 hover:bg-sage-50 flex items-center gap-3">
+                <i data-lucide="wind" class="w-5 h-5 text-sage-600"></i> Focus & Mindfulness
+            </button>
+            <button onclick="navigateTo('detox'); toggleMobileMenu()" data-nav-mobile="detox" class="mobile-nav-link w-full text-left px-4 py-3 rounded-xl text-base font-medium text-sage-700 hover:bg-sage-50 flex items-center gap-3">
+                <i data-lucide="compass" class="w-5 h-5 text-sage-600"></i> Detox Planner & Quiz
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow">
+
+        <!-- =========================================================
+             PAGE 1: HOME PAGE
+        ========================================================= -->
+        <section id="page-home" class="page-view active">
+            <!-- Hero Section -->
+            <div class="relative overflow-hidden bg-gradient-to-b from-sand-100 via-sand-50 to-sage-50/40 pt-10 pb-16 lg:pt-16 lg:pb-24 border-b border-sage-200/50">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                        <!-- Hero Left Content -->
+                        <div class="lg:col-span-7 space-y-6">
+                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sage-100 border border-sage-200 text-sage-800 text-xs font-semibold uppercase tracking-wider">
+                                <span class="w-2 h-2 rounded-full bg-sage-500 animate-pulse"></span>
+                                Reclaim Your Attention
+                            </div>
+                            <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-sage-900 tracking-tight leading-[1.12]">
+                                Technology should serve your life, <span class="text-slatecalm-600">not consume it.</span>
+                            </h1>
+                            <p class="text-lg sm:text-xl text-sage-700 leading-relaxed max-w-2xl">
+                                Discover calm, science-backed habits and interactive mindfulness tools to reduce digital fatigue, deepen your focus, and restore harmony between your online and offline worlds.
+                            </p>
+                            <div class="flex flex-wrap items-center gap-4 pt-2">
+                                <button onclick="navigateTo('detox')" class="px-6 py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold shadow-md shadow-sage-600/15 transition-all flex items-center gap-2">
+                                    <span>Take the Balance Quiz</span>
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="navigateTo('habits')" class="px-6 py-3.5 rounded-2xl bg-white hover:bg-sand-100 text-sage-800 font-semibold border border-sage-200 shadow-sm transition-all">
+                                    Explore Daily Habits
+                                </button>
+                            </div>
+
+                            <!-- Quick Stats Bar -->
+                            <div class="grid grid-cols-3 gap-4 pt-6 border-t border-sage-200/70 max-w-xl">
+                                <div>
+                                    <p class="font-display text-2xl sm:text-3xl font-bold text-slatecalm-700">6h 40m</p>
+                                    <p class="text-xs sm:text-sm text-sage-600 mt-0.5">Avg. daily screen time</p>
+                                </div>
+                                <div>
+                                    <p class="font-display text-2xl sm:text-3xl font-bold text-sage-600">23 min</p>
+                                    <p class="text-xs sm:text-sm text-sage-600 mt-0.5">To refocus after 1 alert</p>
+                                </div>
+                                <div>
+                                    <p class="font-display text-2xl sm:text-3xl font-bold text-slatecalm-700">+42%</p>
+                                    <p class="text-xs sm:text-sm text-sage-600 mt-0.5">Sleep quality off-screens</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hero Right Visual: Custom Calming SVG & Photography Composition -->
+                        <div class="lg:col-span-5 relative">
+                            <div class="relative rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-sage-100 aspect-[4/3]">
+                                <img
+                                    src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=900&q=80"
+                                    alt="Peaceful morning meditation and journal away from digital screens"
+                                    onerror="this.src='https://placehold.co/800x600/e3ebe6/355043?text=Mindful+Living'"
+                                    class="w-full h-full object-cover"
+                                >
+                                <div class="absolute inset-0 bg-gradient-to-t from-sage-900/40 via-transparent to-transparent"></div>
+                                <!-- Floating Calm Card Overlay -->
+                                <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-sage-100 flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-xl bg-sage-100 text-sage-700 flex items-center justify-center shrink-0">
+                                        <!-- Custom SVG Lotus/Balance Icon -->
+                                        <svg class="w-7 h-7" viewBox="0 0 32 32" fill="none">
+                                            <circle cx="16" cy="16" r="14" fill="#e3ebe6"/>
+                                            <path d="M16 7C16 7 21 12.5 21 17C21 19.7614 18.7614 22 16 22C13.2386 22 11 19.7614 11 17C11 12.5 16 7 16 7Z" fill="#547e69"/>
+                                            <path d="M9 14C9 14 12.5 16 14 19.5C12 21 9 20.5 7.5 18.5C6 16.5 9 14 9 14Z" fill="#779cba" fill-opacity="0.8"/>
+                                            <path d="M23 14C23 14 19.5 16 18 19.5C20 21 23 20.5 24.5 18.5C26 16.5 23 14 23 14Z" fill="#779cba" fill-opacity="0.8"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-semibold text-sage-900">Intentional Presence</p>
+                                        <p class="text-xs text-sage-600">Small daily boundaries create hours of mental clarity.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Philosophy Section -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="text-center max-w-3xl mx-auto mb-14">
+                    <span class="text-xs font-bold uppercase tracking-widest text-slatecalm-600">Our Core Philosophy</span>
+                    <h2 class="font-display text-3xl sm:text-4xl font-bold text-sage-900 mt-2">Three Pillars of Digital Well-being</h2>
+                    <p class="text-sage-700 mt-3 text-base sm:text-lg">
+                        Digital well-being isn’t about abandoning modern technology—it’s about designing friction for distractions and flow for what matters most.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Pillar 1 -->
+                    <div class="bg-white rounded-3xl p-8 border border-sage-200/70 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-14 h-14 rounded-2xl bg-sage-100 text-sage-700 flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <rect x="5" y="2" width="14" height="20" rx="3"/>
+                                <path d="M9 18h6M12 6v4l2.5 1.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-sage-900 mb-3">1. Conscious Boundaries</h3>
+                        <p class="text-sage-700 text-sm leading-relaxed">
+                            Replace reactive scrolling with intentional check-ins. By curating notifications and creating tech-free zones, you regain control over your daily rhythm.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 2 -->
+                    <div class="bg-white rounded-3xl p-8 border border-sage-200/70 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-14 h-14 rounded-2xl bg-slatecalm-100 text-slatecalm-700 flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <circle cx="12" cy="12" r="9"/>
+                                <circle cx="12" cy="12" r="4"/>
+                                <path d="M12 3v2M12 19v2M3 12h2M19 12h2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-sage-900 mb-3">2. Deep Single-Tasking</h3>
+                        <p class="text-sage-700 text-sm leading-relaxed">
+                            Constant context-switching drains cognitive energy. Structured focus intervals paired with mindful breathing allow your brain to enter restorative flow states.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 3 -->
+                    <div class="bg-white rounded-3xl p-8 border border-sage-200/70 shadow-sm hover:shadow-md transition-all">
+                        <div class="w-14 h-14 rounded-2xl bg-sand-200 text-sage-800 flex items-center justify-center mb-6">
+                            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"/>
+                                <path d="M17 4a2 2 0 0 0 2 2a2 2 0 0 0 -2 2a2 2 0 0 0 -2 -2a2 2 0 0 0 2 -2"/>
+                            </svg>
+                        </div>
+                        <h3 class="font-display text-xl font-bold text-sage-900 mb-3">3. Restorative Unplugging</h3>
+                        <p class="text-sage-700 text-sm leading-relaxed">
+                            Protect your circadian rhythm and nervous system with evening screen curfews and analog weekend rituals that reconnect you with nature and community.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Navigation Cards to Other Pages -->
+            <div class="bg-sage-100/60 border-t border-sage-200/60 py-16">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-widest text-sage-600">Interactive Toolkit</span>
+                            <h2 class="font-display text-3xl font-bold text-sage-900 mt-1">Explore Your Digital Wellness Spaces</h2>
+                        </div>
+                        <p class="text-sm text-sage-700 max-w-md">Select any module below to track habits, practice guided focus, or build your personalized offline weekend.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <!-- Card to Page 2 -->
+                        <div onclick="navigateTo('habits')" class="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-sage-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                            <div class="h-48 overflow-hidden relative">
+                                <img
+                                    src="https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=800&q=80"
+                                    alt="Smartphone resting calmly on wooden desk"
+                                    onerror="this.src='https://placehold.co/800x450/d0dce7/30455c?text=Screen+Habits'"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                >
+                                <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur text-xs font-semibold text-sage-800">Module 01</span>
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between">
+                                <div>
+                                    <h3 class="font-display text-xl font-bold text-sage-900 group-hover:text-sage-600 transition-colors">Screen Time & Daily Habits</h3>
+                                    <p class="text-sm text-sage-700 mt-2 leading-relaxed">
+                                        Master grayscale mode, notification audits, and check off your daily wellness habits to watch your live balance score rise.
+                                    </p>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-sage-100 flex items-center justify-between text-sm font-semibold text-sage-700 group-hover:text-sage-900">
+                                    <span>Open Habit Tracker</span>
+                                    <i data-lucide="arrow-up-right" class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card to Page 3 -->
+                        <div onclick="navigateTo('focus')" class="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-sage-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                            <div class="h-48 overflow-hidden relative">
+                                <img
+                                    src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80"
+                                    alt="Clean calm workspace with tea and notebook"
+                                    onerror="this.src='https://placehold.co/800x450/e3ebe6/355043?text=Focus+Tools'"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                >
+                                <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur text-xs font-semibold text-slatecalm-800">Module 02</span>
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between">
+                                <div>
+                                    <h3 class="font-display text-xl font-bold text-sage-900 group-hover:text-slatecalm-600 transition-colors">Focus & Mindfulness Tools</h3>
+                                    <p class="text-sm text-sage-700 mt-2 leading-relaxed">
+                                        Use our visual Pomodoro timer for deep work intervals and reset your nervous system with an animated 4-7-8 breathing guide.
+                                    </p>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-sage-100 flex items-center justify-between text-sm font-semibold text-slatecalm-700 group-hover:text-slatecalm-900">
+                                    <span>Launch Focus Studio</span>
+                                    <i data-lucide="arrow-up-right" class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card to Page 4 -->
+                        <div onclick="navigateTo('detox')" class="group cursor-pointer bg-white rounded-3xl overflow-hidden border border-sage-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                            <div class="h-48 overflow-hidden relative">
+                                <img
+                                    src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80"
+                                    alt="Sunlit forest trail for weekend digital detox"
+                                    onerror="this.src='https://placehold.co/800x450/ede6d8/2c4137?text=Digital+Detox'"
+                                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                >
+                                <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur text-xs font-semibold text-sage-800">Module 03</span>
+                            </div>
+                            <div class="p-6 flex-grow flex flex-col justify-between">
+                                <div>
+                                    <h3 class="font-display text-xl font-bold text-sage-900 group-hover:text-sage-600 transition-colors">Digital Detox Planner & Quiz</h3>
+                                    <p class="text-sm text-sage-700 mt-2 leading-relaxed">
+                                        Assess your current digital balance in 60 seconds and assemble a custom, printable offline itinerary for your weekend.
+                                    </p>
+                                </div>
+                                <div class="mt-6 pt-4 border-t border-sage-100 flex items-center justify-between text-sm font-semibold text-sage-700 group-hover:text-sage-900">
+                                    <span>Take Quiz & Plan Detox</span>
+                                    <i data-lucide="arrow-up-right" class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             PAGE 2: SCREEN TIME & HABITS
+        ========================================================= -->
+        <section id="page-habits" class="page-view">
+            <div class="bg-sage-100/50 border-b border-sage-200/70 py-12">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <span class="text-xs font-bold uppercase tracking-widest text-sage-600">Healthy Boundaries</span>
+                    <h1 class="font-display text-3xl sm:text-4xl font-bold text-sage-900 mt-2">Screen Time & Intentional Habits</h1>
+                    <p class="text-sage-700 mt-3 max-w-2xl text-base sm:text-lg">
+                        Small environmental shifts reduce unconscious phone pickups by up to 40%. Explore practical strategies below and track your daily habits in real time.
+                    </p>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+                <!-- Strategy Cards Grid -->
+                <div>
+                    <h2 class="font-display text-2xl font-bold text-sage-900 mb-6">Practical Digital Boundary Strategies</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Strategy 1: Notification Audit -->
+                        <div class="bg-white rounded-3xl overflow-hidden border border-sage-200/80 shadow-sm flex flex-col">
+                            <div class="h-44 bg-slatecalm-100 relative overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80"
+                                    alt="Focused work without distracting alerts"
+                                    onerror="this.src='https://placehold.co/800x400/d0dce7/30455c?text=Notification+Audit'"
+                                    class="w-full h-full object-cover"
+                                >
+                                <div class="absolute inset-0 bg-slatecalm-900/20"></div>
+                                <span class="absolute bottom-3 left-3 bg-white/95 px-3 py-1 rounded-xl text-xs font-bold text-slatecalm-800 flex items-center gap-1.5 shadow-sm">
+                                    <i data-lucide="bell-off" class="w-3.5 h-3.5 text-slatecalm-600"></i>
+                                    Attention Protection
+                                </span>
+                            </div>
+                            <div class="p-6 flex-grow space-y-3">
+                                <h3 class="font-display text-xl font-bold text-sage-900">The 10-Minute Notification Audit</h3>
+                                <p class="text-sm text-sage-700 leading-relaxed">
+                                    Turn off all non-human notifications. Keep alerts exclusively for real people (calls, direct messages) and silence promotional badges, news flashes, and social likes.
+                                </p>
+                                <div class="bg-sand-100 p-3.5 rounded-2xl text-xs text-sage-800 font-medium">
+                                    <strong>Pro Tip:</strong> Enable "Scheduled Summary" so non-urgent updates arrive twice a day on your terms.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Strategy 2: Grayscale Mode -->
+                        <div class="bg-white rounded-3xl overflow-hidden border border-sage-200/80 shadow-sm flex flex-col">
+                            <div class="h-44 bg-sage-200 relative overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80"
+                                    alt="Monochrome calm aesthetic reducing dopamine triggers"
+                                    onerror="this.src='https://placehold.co/800x400/e3ebe6/355043?text=Grayscale+Mode'"
+                                    class="w-full h-full object-cover grayscale"
+                                >
+                                <div class="absolute inset-0 bg-sage-900/15"></div>
+                                <span class="absolute bottom-3 left-3 bg-white/95 px-3 py-1 rounded-xl text-xs font-bold text-sage-800 flex items-center gap-1.5 shadow-sm">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5 text-sage-600"></i>
+                                    Dopamine Reset
+                                </span>
+                            </div>
+                            <div class="p-6 flex-grow space-y-3">
+                                <h3 class="font-display text-xl font-bold text-sage-900">Switch to Grayscale Display</h3>
+                                <p class="text-sm text-sage-700 leading-relaxed">
+                                    Vibrant red badges and high-contrast app icons are engineered to hijack visual attention. Removing color makes your phone feel like a calm tool rather than a slot machine.
+                                </p>
+                                <div class="bg-sand-100 p-3.5 rounded-2xl text-xs text-sage-800 font-medium">
+                                    <strong>Pro Tip:</strong> Set a triple-click accessibility shortcut on iOS or Android to toggle grayscale after 8 PM.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Strategy 3: Bedtime Curfew -->
+                        <div class="bg-white rounded-3xl overflow-hidden border border-sage-200/80 shadow-sm flex flex-col">
+                            <div class="h-44 bg-sand-200 relative overflow-hidden">
+                                <img
+                                    src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80"
+                                    alt="Cozy book and warm lamp for screen-free evening"
+                                    onerror="this.src='https://placehold.co/800x400/ede6d8/2c4137?text=Bedtime+Curfew'"
+                                    class="w-full h-full object-cover"
+                                >
+                                <div class="absolute inset-0 bg-sage-900/20"></div>
+                                <span class="absolute bottom-3 left-3 bg-white/95 px-3 py-1 rounded-xl text-xs font-bold text-sage-800 flex items-center gap-1.5 shadow-sm">
+                                    <i data-lucide="moon" class="w-3.5 h-3.5 text-slatecalm-600"></i>
+                                    Circadian Care
+                                </span>
+                            </div>
+                            <div class="p-6 flex-grow space-y-3">
+                                <h3 class="font-display text-xl font-bold text-sage-900">60-Minute Sunset Screen Curfew</h3>
+                                <p class="text-sm text-sage-700 leading-relaxed">
+                                    Blue light and stimulating feeds suppress melatonin production. Charge your phone outside the bedroom and swap late-night scrolling for paper reading or stretching.
+                                </p>
+                                <div class="bg-sand-100 p-3.5 rounded-2xl text-xs text-sage-800 font-medium">
+                                    <strong>Pro Tip:</strong> Use a classic analog alarm clock so your phone never needs to sit on your nightstand.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Daily Screen Habit Checklist -->
+                <div class="bg-white rounded-3xl border border-sage-200 shadow-md p-6 sm:p-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+                        <!-- Left: Live Wellness Score Gauge -->
+                        <div class="lg:col-span-5 bg-gradient-to-br from-sage-50 to-slatecalm-50 rounded-3xl p-6 sm:p-8 border border-sage-200/70 text-center space-y-5">
+                            <span class="inline-block px-3 py-1 rounded-full bg-white text-xs font-bold uppercase tracking-wider text-sage-700 shadow-sm">
+                                Live Daily Wellness Score
+                            </span>
+
+                            <!-- Circular Progress SVG -->
+                            <div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+                                <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+                                    <circle cx="60" cy="60" r="52" fill="none" stroke="#e3ebe6" stroke-width="10" />
+                                    <circle id="habit-score-ring" cx="60" cy="60" r="52" fill="none" stroke="#547e69" stroke-width="10"
+                                        stroke-dasharray="326.72" stroke-dashoffset="245" stroke-linecap="round"
+                                        class="transition-all duration-500 ease-out" />
+                                </svg>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span id="habit-score-value" class="font-display text-4xl font-bold text-sage-900">25%</span>
+                                    <span id="habit-count-label" class="text-xs font-medium text-sage-600 mt-1">2 of 8 completed</span>
+                                </div>
+                            </div>
+
+                            <div id="habit-feedback-box" class="bg-white/90 rounded-2xl p-4 border border-sage-100">
+                                <p id="habit-feedback-title" class="font-semibold text-sage-900 text-sm">Gentle Start</p>
+                                <p id="habit-feedback-desc" class="text-xs text-sage-600 mt-1">
+                                    You’ve begun building mindful friction. Check off a few more habits as you move through your day!
+                                </p>
+                            </div>
+
+                            <button onclick="resetHabits()" class="text-xs font-semibold text-slatecalm-600 hover:text-slatecalm-800 underline underline-offset-4">
+                                Reset Today's Checklist
+                            </button>
+                        </div>
+
+                        <!-- Right: Interactive Checkboxes -->
+                        <div class="lg:col-span-7 space-y-5">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div>
+                                    <h2 class="font-display text-2xl font-bold text-sage-900">Daily Screen Habit Checklist</h2>
+                                    <p class="text-sm text-sage-600">Tap each intentional habit as you complete it today.</p>
+                                </div>
+                                <span class="text-xs font-medium bg-sage-100 text-sage-800 px-3 py-1.5 rounded-xl self-start">
+                                    Auto-saved locally
+                                </span>
+                            </div>
+
+                            <div id="habit-list" class="space-y-3">
+                                <!-- Habits rendered dynamically by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             PAGE 3: FOCUS & MINDFULNESS TOOLS
+        ========================================================= -->
+        <section id="page-focus" class="page-view">
+            <div class="bg-slatecalm-50 border-b border-slatecalm-200/70 py-12">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <span class="text-xs font-bold uppercase tracking-widest text-slatecalm-600">Restorative Studio</span>
+                    <h1 class="font-display text-3xl sm:text-4xl font-bold text-sage-900 mt-2">Focus & Mindfulness Tools</h1>
+                    <p class="text-sage-700 mt-3 max-w-2xl text-base sm:text-lg">
+                        Anchor your attention with a distraction-free Pomodoro timer and regulate your nervous system with a guided 4-7-8 breathing exercise.
+                    </p>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-stretch">
+
+                    <!-- WIDGET 1: POMODORO / FOCUS TIMER -->
+                    <div class="bg-white rounded-3xl border border-sage-200 shadow-md p-6 sm:p-10 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slatecalm-600">Deep Work Timer</span>
+                                    <h2 class="font-display text-2xl font-bold text-sage-900 mt-0.5">Pomodoro Focus Session</h2>
+                                </div>
+                                <div class="w-11 h-11 rounded-2xl bg-slatecalm-100 text-slatecalm-700 flex items-center justify-center">
+                                    <i data-lucide="timer" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+
+                            <!-- Mode Selector Tabs -->
+                            <div class="grid grid-cols-3 gap-2 bg-sand-100 p-1.5 rounded-2xl border border-sage-200/60 mb-8">
+                                <button onclick="setTimerMode('focus')" id="mode-focus" class="timer-mode-btn py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-white text-sage-900 shadow-sm transition-all">
+                                    Focus (25m)
+                                </button>
+                                <button onclick="setTimerMode('short')" id="mode-short" class="timer-mode-btn py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-sage-700 hover:text-sage-900 transition-all">
+                                    Short Break (5m)
+                                </button>
+                                <button onclick="setTimerMode('long')" id="mode-long" class="timer-mode-btn py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-sage-700 hover:text-sage-900 transition-all">
+                                    Long Break (15m)
+                                </button>
+                            </div>
+
+                            <!-- Circular Timer Display -->
+                            <div class="relative w-64 h-64 mx-auto my-6 flex items-center justify-center">
+                                <svg class="w-full h-full -rotate-90" viewBox="0 0 140 140">
+                                    <circle cx="70" cy="70" r="62" fill="none" stroke="#eaeff4" stroke-width="8" />
+                                    <circle id="timer-progress-ring" cx="70" cy="70" r="62" fill="none" stroke="#567ea2" stroke-width="8"
+                                        stroke-dasharray="389.55" stroke-dashoffset="0" stroke-linecap="round"
+                                        class="transition-all duration-500 ease-linear" />
+                                </svg>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                                    <span id="timer-display" class="font-display text-5xl font-bold text-sage-900 tracking-tight">25:00</span>
+                                    <span id="timer-status-text" class="text-xs font-semibold uppercase tracking-widest text-slatecalm-600 mt-2">Ready to Focus</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timer Controls & Session Counter -->
+                        <div class="space-y-5 mt-4">
+                            <div class="flex items-center justify-center gap-3">
+                                <button id="timer-toggle-btn" onclick="toggleTimer()" class="px-7 py-3.5 rounded-2xl bg-slatecalm-600 hover:bg-slatecalm-700 text-white font-semibold shadow-sm transition-all flex items-center gap-2">
+                                    <i data-lucide="play" id="timer-toggle-icon" class="w-5 h-5"></i>
+                                    <span id="timer-toggle-label">Start Focus</span>
+                                </button>
+                                <button onclick="resetTimer()" class="p-3.5 rounded-2xl bg-sand-100 hover:bg-sand-200 text-sage-800 border border-sage-200 transition-all" aria-label="Reset Timer" title="Reset Timer">
+                                    <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+
+                            <div class="bg-sand-50 rounded-2xl p-4 border border-sage-200/60 flex items-center justify-between text-sm">
+                                <span class="text-sage-700 font-medium">Completed Focus Cycles Today:</span>
+                                <div class="flex items-center gap-2">
+                                    <span id="completed-pomodoros" class="font-display font-bold text-lg text-slatecalm-700">0</span>
+                                    <span class="text-xs text-sage-500">sessions</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WIDGET 2: 4-7-8 GUIDED BREATHING EXERCISE -->
+                    <div class="bg-white rounded-3xl border border-sage-200 shadow-md p-6 sm:p-10 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-sage-600">Nervous System Reset</span>
+                                    <h2 class="font-display text-2xl font-bold text-sage-900 mt-0.5">4-7-8 Breathing Exercise</h2>
+                                </div>
+                                <div class="w-11 h-11 rounded-2xl bg-sage-100 text-sage-700 flex items-center justify-center">
+                                    <i data-lucide="wind" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+
+                            <p class="text-sm text-sage-700 leading-relaxed mb-6">
+                                Developed to calm digital overstimulation: inhale gently for <strong>4 seconds</strong>, hold peacefully for <strong>7 seconds</strong>, and exhale slowly for <strong>8 seconds</strong>.
+                            </p>
+
+                            <!-- Animated Breathing Orb Stage -->
+                            <div class="relative h-64 my-6 flex items-center justify-center bg-gradient-to-b from-sage-50/80 to-sand-50 rounded-3xl border border-sage-100 overflow-hidden">
+                                <!-- Outer ambient rings -->
+                                <div class="absolute w-52 h-52 rounded-full border border-sage-200/70"></div>
+                                <div class="absolute w-36 h-36 rounded-full border border-sage-300/60"></div>
+
+                                <!-- Animated Expanding/Contracting Orb -->
+                                <div id="breathing-orb" class="breathing-orb w-28 h-28 rounded-full bg-sage-400/90 shadow-lg shadow-sage-500/20 flex flex-col items-center justify-center text-white text-center px-2 z-10 scale-100">
+                                    <span id="breath-phase-label" class="font-display font-bold text-base tracking-wide">Ready</span>
+                                    <span id="breath-countdown" class="text-xs font-medium opacity-90 mt-0.5">Press Start</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Breathing Controls & Guidance -->
+                        <div class="space-y-5 mt-4">
+                            <div class="flex items-center justify-center gap-3">
+                                <button id="breath-toggle-btn" onclick="toggleBreathing()" class="px-7 py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold shadow-sm transition-all flex items-center gap-2">
+                                    <i data-lucide="sparkles" id="breath-toggle-icon" class="w-5 h-5"></i>
+                                    <span id="breath-toggle-label">Begin 4-7-8 Cycle</span>
+                                </button>
+                            </div>
+
+                            <div class="bg-sage-50/80 rounded-2xl p-4 border border-sage-200/60 flex items-center justify-between text-sm">
+                                <span id="breath-instruction-text" class="text-sage-800 font-medium">Find a comfortable posture and soften your gaze.</span>
+                                <span class="text-xs font-bold text-sage-700 shrink-0 ml-2">Cycles: <span id="breath-cycles-count">0</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Calming Visual Banner -->
+                <div class="mt-12 rounded-3xl overflow-hidden relative bg-sage-900 text-white shadow-lg">
+                    <img
+                        src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80"
+                        alt="Calm ocean horizon promoting mental spaciousness"
+                        onerror="this.src='https://placehold.co/1200x350/355043/ffffff?text=Breathe+and+Reset'"
+                        class="w-full h-56 sm:h-64 object-cover opacity-45"
+                    >
+                    <div class="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 max-w-3xl">
+                        <span class="text-xs font-bold uppercase tracking-widest text-sage-200">Eye Strain Rule</span>
+                        <h3 class="font-display text-2xl sm:text-3xl font-bold mt-1">Remember the 20-20-20 Vision Break</h3>
+                        <p class="text-sm sm:text-base text-sand-100 mt-2 leading-relaxed">
+                            Every 20 minutes spent looking at a screen, look at something at least 20 feet away for 20 seconds to relax your eye muscles and blink naturally.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             PAGE 4: DIGITAL DETOX PLANNER & QUIZ
+        ========================================================= -->
+        <section id="page-detox" class="page-view">
+            <div class="bg-sand-100 border-b border-sage-200/70 py-12">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <span class="text-xs font-bold uppercase tracking-widest text-sage-600">Self-Reflection & Action</span>
+                    <h1 class="font-display text-3xl sm:text-4xl font-bold text-sage-900 mt-2">Digital Detox Planner & Balance Quiz</h1>
+                    <p class="text-sage-700 mt-3 max-w-2xl text-base sm:text-lg">
+                        Evaluate your current digital habits with our 5-question reflection quiz, then build and print a restorative offline schedule for your upcoming weekend.
+                    </p>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+
+                <!-- PART 1: 5-QUESTION DIGITAL BALANCE SELF-ASSESSMENT QUIZ -->
+                <div class="bg-white rounded-3xl border border-sage-200 shadow-md p-6 sm:p-10">
+                    <div class="max-w-3xl mx-auto">
+                        <div class="flex items-center justify-between border-b border-sage-100 pb-5 mb-8">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slatecalm-600">60-Second Check-In</span>
+                                <h2 class="font-display text-2xl font-bold text-sage-900 mt-0.5">Digital Balance Self-Assessment Quiz</h2>
+                            </div>
+                            <span id="quiz-progress-badge" class="px-3.5 py-1.5 rounded-full bg-sage-100 text-sage-800 text-xs font-bold">
+                                0 / 5 Answered
+                            </span>
+                        </div>
+
+                        <!-- Quiz Questions Form -->
+                        <div id="quiz-container" class="space-y-8">
+                            <!-- Questions injected via JS -->
+                        </div>
+
+                        <!-- Submit Quiz Button -->
+                        <div id="quiz-actions" class="mt-8 pt-6 border-t border-sage-100 flex flex-wrap items-center justify-between gap-4">
+                            <p class="text-xs text-sage-600">Answer all 5 questions to unlock your personalized balance profile.</p>
+                            <button onclick="evaluateQuiz()" class="px-7 py-3.5 rounded-2xl bg-sage-600 hover:bg-sage-700 text-white font-semibold shadow-sm transition-all flex items-center gap-2">
+                                <span>Calculate My Balance Score</span>
+                                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                        <!-- Quiz Result Panel (Hidden initially) -->
+                        <div id="quiz-result-panel" class="hidden mt-8 bg-gradient-to-br from-sage-50 via-sand-50 to-slatecalm-50 rounded-3xl p-6 sm:p-8 border border-sage-200 space-y-5">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sage-200/70 pb-5">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-slatecalm-600">Your Assessment Result</span>
+                                    <h3 id="quiz-result-tier" class="font-display text-2xl sm:text-3xl font-bold text-sage-900 mt-1">Mindful Navigator</h3>
+                                </div>
+                                <div class="bg-white px-5 py-3 rounded-2xl border border-sage-200 text-center shadow-sm">
+                                    <span class="block text-xs text-sage-600 font-medium">Wellness Score</span>
+                                    <span id="quiz-result-score" class="font-display text-2xl font-bold text-sage-700">16 / 20</span>
+                                </div>
+                            </div>
+                            <p id="quiz-result-summary" class="text-sage-800 text-sm sm:text-base leading-relaxed"></p>
+                            <div class="bg-white/90 rounded-2xl p-4 border border-sage-100">
+                                <p class="text-xs font-bold uppercase tracking-wider text-sage-600 mb-2">Recommended Next Step</p>
+                                <p id="quiz-result-recommendation" class="text-sm text-sage-800 font-medium"></p>
+                            </div>
+                            <div class="pt-2">
+                                <button onclick="resetQuiz()" class="text-sm font-semibold text-slatecalm-600 hover:text-slatecalm-800 underline underline-offset-4">
+                                    Retake Assessment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PART 2: WEEKEND DETOX PLAN BUILDER -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <!-- Left: Activity Picker -->
+                    <div class="lg:col-span-6 bg-white rounded-3xl border border-sage-200 shadow-md p-6 sm:p-8 space-y-6">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-sage-600">Curate Your Offline Time</span>
+                            <h2 class="font-display text-2xl font-bold text-sage-900 mt-0.5">Weekend Detox Plan Builder</h2>
+                            <p class="text-sm text-sage-600 mt-1">Select analog activities below to add them to your custom Saturday & Sunday schedule.</p>
+                        </div>
+
+                        <!-- Day Selector -->
+                        <div class="flex items-center gap-3 bg-sand-100 p-2 rounded-2xl border border-sage-200/70">
+                            <span class="text-xs font-bold uppercase tracking-wider text-sage-700 pl-2">Add to:</span>
+                            <button onclick="setDetoxDay('Saturday')" id="btn-day-sat" class="flex-1 py-2 px-3 rounded-xl text-sm font-semibold bg-white text-sage-900 shadow-sm transition-all">
+                                Saturday
+                            </button>
+                            <button onclick="setDetoxDay('Sunday')" id="btn-day-sun" class="flex-1 py-2 px-3 rounded-xl text-sm font-semibold text-sage-700 hover:text-sage-900 transition-all">
+                                Sunday
+                            </button>
+                        </div>
+
+                        <!-- Curated Offline Activities Library -->
+                        <div id="detox-activity-library" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Populated via JS -->
+                        </div>
+
+                        <!-- Custom Activity Input -->
+                        <div class="pt-4 border-t border-sage-100">
+                            <label for="custom-detox-input" class="block text-xs font-bold uppercase tracking-wider text-sage-700 mb-2">
+                                Or Add Your Own Offline Ritual
+                            </label>
+                            <div class="flex gap-2">
+                                <input id="custom-detox-input" type="text" placeholder="e.g., Bake sourdough bread, visit botanical garden..."
+                                    class="flex-grow px-4 py-2.5 rounded-xl border border-sage-200 text-sm focus:outline-none focus:border-sage-500 bg-sand-50">
+                                <button onclick="addCustomDetoxActivity()" class="px-4 py-2.5 rounded-xl bg-slatecalm-600 hover:bg-slatecalm-700 text-white text-sm font-semibold transition-all shrink-0">
+                                    Add
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Printable / Saveable Itinerary Preview -->
+                    <div id="printable-detox-plan" class="lg:col-span-6 bg-sand-50 rounded-3xl border-2 border-sage-200 shadow-md p-6 sm:p-8 space-y-6">
+                        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-sage-200 pb-5">
+                            <div>
+                                <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sage-600">
+                                    <i data-lucide="calendar-heart" class="w-4 h-4"></i>
+                                    Personal Offline Itinerary
+                                </span>
+                                <h3 class="font-display text-2xl font-bold text-sage-900 mt-1">My Unplugged Weekend</h3>
+                            </div>
+                            <div class="flex items-center gap-2 no-print">
+                                <button onclick="saveDetoxPlan()" class="px-3.5 py-2 rounded-xl bg-sage-600 hover:bg-sage-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all">
+                                    <i data-lucide="bookmark-check" class="w-4 h-4"></i>
+                                    <span>Save Plan</span>
+                                </button>
+                                <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-sage-50 text-sage-800 border border-sage-200 text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all">
+                                    <i data-lucide="printer" class="w-4 h-4"></i>
+                                    <span>Print</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Saturday Schedule -->
+                        <div class="space-y-3">
+                            <h4 class="font-display font-bold text-base text-slatecalm-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-sage-500"></span>
+                                Saturday — Slow Down & Reconnect
+                            </h4>
+                            <ul id="saturday-plan-list" class="space-y-2 min-h-[60px]">
+                                <!-- Rendered via JS -->
+                            </ul>
+                        </div>
+
+                        <!-- Sunday Schedule -->
+                        <div class="space-y-3 pt-2">
+                            <h4 class="font-display font-bold text-base text-slatecalm-800 flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-slatecalm-500"></span>
+                                Sunday — Restore & Prepare Intentionally
+                            </h4>
+                            <ul id="sunday-plan-list" class="space-y-2 min-h-[60px]">
+                                <!-- Rendered via JS -->
+                            </ul>
+                        </div>
+
+                        <div class="pt-4 border-t border-sage-200/70 flex items-center justify-between text-xs text-sage-600">
+                            <span>Tip: Set an auto-responder before powering down.</span>
+                            <button onclick="clearDetoxPlan()" class="no-print text-slatecalm-600 hover:text-slatecalm-800 font-semibold underline">
+                                Clear Schedule
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-sage-900 text-sage-200 border-t border-sage-800 mt-16 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-2 space-y-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-sage-600 text-white flex items-center justify-center">
+                            <i data-lucide="leaf" class="w-4 h-4"></i>
+                        </div>
+                        <span class="font-display font-bold text-lg text-white">Digital Balance</span>
+                    </div>
+                    <p class="text-sm text-sage-300 max-w-md leading-relaxed">
+                        A calm sanctuary for building healthier relationships with screens, cultivating deep focus, and making space for real-world presence.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-display font-semibold text-white text-sm uppercase tracking-wider mb-3">Explore Pages</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><button onclick="navigateTo('home')" class="hover:text-white transition-colors">Home & Philosophy</button></li>
+                        <li><button onclick="navigateTo('habits')" class="hover:text-white transition-colors">Screen Time & Habits</button></li>
+                        <li><button onclick="navigateTo('focus')" class="hover:text-white transition-colors">Focus & Mindfulness</button></li>
+                        <li><button onclick="navigateTo('detox')" class="hover:text-white transition-colors">Detox Planner & Quiz</button></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-display font-semibold text-white text-sm uppercase tracking-wider mb-3">Daily Reminder</h4>
+                    <p class="text-sm text-sage-300 italic leading-relaxed">
+                        “Almost everything will work again if you unplug it for a few minutes, including you.”
+                    </p>
+                </div>
+            </div>
+
+            <div class="border-t border-sage-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center text-xs text-sage-400 gap-4">
+                <p>&copy; 2026 Digital Balance Initiative. Designed for mindful living.</p>
+                <p>No tracking cookies &bull; Your habits stay privately in your browser.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- =========================================================
+         JAVASCRIPT APPLICATION LOGIC
+    ========================================================= -->
+    <script>
+        // ---------------------------------------------------------
+        // 1. TOAST NOTIFICATION SYSTEM (Replaces alert/confirm)
+        // ---------------------------------------------------------
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            const bgClass = type === 'success'
+                ? 'bg-sage-800 text-white border-sage-700'
+                : 'bg-slatecalm-800 text-white border-slatecalm-700';
+
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border text-sm font-medium transform transition-all duration-300 translate-y-4 opacity-0 ${bgClass}`;
+            toast.innerHTML = `
+                <span class="w-2 h-2 rounded-full bg-sage-300 shrink-0"></span>
+                <span>${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger entrance animation
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            });
+
+            // Auto dismiss
+            setTimeout(() => {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // Gentle Web Audio Chime using Tone.js (no external URLs)
+        function playGentleChime() {
+            try {
+                if (typeof Tone !== 'undefined') {
+                    Tone.start();
+                    const synth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.08, decay: 0.4, sustain: 0.2, release: 1.8 }
+                    }).toDestination();
+                    synth.volume.value = -10;
+                    synth.triggerAttackRelease(['C5', 'E5', 'G5'], '1.2');
+                }
+            } catch (e) {
+                // Fail silently if audio blocked
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 2. MULTI-PAGE SPA NAVIGATION
+        // ---------------------------------------------------------
+        function navigateTo(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-view').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Update desktop nav active styles
+            document.querySelectorAll('.nav-link').forEach(btn => {
+                if (btn.dataset.nav === pageId) {
+                    btn.className = 'nav-link px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 bg-white text-sage-800 shadow-sm';
+                } else {
+                    btn.className = 'nav-link px-4 py-2 rounded-xl text-sm font-medium text-sage-700 hover:text-sage-900 hover:bg-white/60 transition-all duration-200';
+                }
+            });
+
+            // Update mobile nav active styles
+            document.querySelectorAll('.mobile-nav-link').forEach(btn => {
+                if (btn.dataset.navMobile === pageId) {
+                    btn.className = 'mobile-nav-link w-full text-left px-4 py-3 rounded-xl text-base font-medium bg-sage-100 text-sage-900 flex items-center gap-3';
+                } else {
+                    btn.className = 'mobile-nav-link w-full text-left px-4 py-3 rounded-xl text-base font-medium text-sage-700 hover:bg-sage-50 flex items-center gap-3';
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // ---------------------------------------------------------
+        // 3. PAGE 2: DAILY SCREEN HABIT CHECKLIST
+        // ---------------------------------------------------------
+        const defaultHabits = [
+            { id: 'h1', title: 'Screen-Free First 30 Minutes', desc: 'Started the morning with water, light, or stretching before checking notifications.', completed: true },
+            { id: 'h2', title: 'Non-Essential Notifications Muted', desc: 'Kept Focus / Do Not Disturb active during deep work blocks.', completed: true },
+            { id: 'h3', title: 'Device-Free Meals', desc: 'Ate lunch or dinner without scrolling or watching videos.', completed: false },
+            { id: 'h4', title: '20-20-20 Eye Rest Breaks', desc: 'Looked 20 feet away for 20 seconds multiple times today.', completed: false },
+            { id: 'h5', title: 'Outdoor Daylight Walk', desc: 'Stepped outside without headphones or a screen for at least 15 minutes.', completed: false },
+            { id: 'h6', title: 'Single-Tasking Focus Block', desc: 'Completed one uninterrupted 25-minute task with only one tab open.', completed: false },
+            { id: 'h7', title: 'Evening Grayscale / Night Shift', desc: 'Reduced blue light and screen stimulation after sunset.', completed: false },
+            { id: 'h8', title: 'Bedroom Phone Curfew', desc: 'Docked phone outside the bedroom 45+ minutes before sleep.', completed: false }
+        ];
+
+        let habitsState = JSON.parse(localStorage.getItem('db_habits')) || defaultHabits;
+
+        function renderHabits() {
+            const listEl = document.getElementById('habit-list');
+            listEl.innerHTML = '';
+
+            habitsState.forEach(habit => {
+                const item = document.createElement('label');
+                item.className = `flex items-start gap-4 p-4 rounded-2xl border cursor-pointer transition-all select-none ${
+                    habit.completed
+                        ? 'bg-sage-50/90 border-sage-300 shadow-xs'
+                        : 'bg-sand-50/60 border-sage-200/70 hover:bg-sand-100/70'
+                }`;
+
+                item.innerHTML = `
+                    <input type="checkbox" ${habit.completed ? 'checked' : ''} onchange="toggleHabit('${habit.id}')"
+                        class="mt-1 w-5 h-5 rounded-lg accent-sage-600 cursor-pointer shrink-0">
+                    <div class="flex-grow">
+                        <span class="block font-semibold text-sm sm:text-base ${habit.completed ? 'line-through text-sage-600' : 'text-sage-900'}">
+                            ${habit.title}
+                        </span>
+                        <span class="block text-xs text-sage-600 mt-0.5">${habit.desc}</span>
+                    </div>
+                    <span class="text-xs font-bold px-2.5 py-1 rounded-lg ${habit.completed ? 'bg-sage-200 text-sage-800' : 'bg-white text-sage-500 border border-sage-100'}">
+                        +12.5%
+                    </span>
+                `;
+                listEl.appendChild(item);
+            });
+
+            updateHabitScore();
+        }
+
+        function toggleHabit(id) {
+            habitsState = habitsState.map(h => h.id === id ? { ...h, completed: !h.completed } : h);
+            localStorage.setItem('db_habits', JSON.stringify(habitsState));
+            renderHabits();
+        }
+
+        function resetHabits() {
+            habitsState = habitsState.map(h => ({ ...h, completed: false }));
+            localStorage.setItem('db_habits', JSON.stringify(habitsState));
+            renderHabits();
+            showToast('Daily habit checklist reset for a fresh start.');
+        }
+
+        function updateHabitScore() {
+            const completedCount = habitsState.filter(h => h.completed).length;
+            const total = habitsState.length;
+            const percentage = Math.round((completedCount / total) * 100);
+
+            // SVG circle circumference: 2 * PI * 52 = 326.72
+            const circumference = 326.72;
+            const offset = circumference - (percentage / 100) * circumference;
+
+            document.getElementById('habit-score-ring').style.strokeDashoffset = offset;
+            document.getElementById('habit-score-value').textContent = `${percentage}%`;
+            document.getElementById('habit-count-label').textContent = `${completedCount} of ${total} completed`;
+
+            const titleEl = document.getElementById('habit-feedback-title');
+            const descEl = document.getElementById('habit-feedback-desc');
+
+            if (percentage === 0) {
+                titleEl.textContent = 'Ready to Begin';
+                descEl.textContent = 'Pick one small boundary—like a screen-free meal—to build effortless momentum.';
+            } else if (percentage < 50) {
+                titleEl.textContent = 'Gentle Momentum';
+                descEl.textContent = 'You’ve started creating mindful friction. Each small habit protects your mental clarity.';
+            } else if (percentage < 85) {
+                titleEl.textContent = 'Grounded & Intentional';
+                descEl.textContent = 'Wonderful balance! You are actively steering your attention instead of letting feeds steer you.';
+            } else {
+                titleEl.textContent = 'Deep Digital Harmony';
+                descEl.textContent = 'Exemplary presence today. Notice how much calmer and more spacious your mind feels.';
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 4. PAGE 3: POMODORO FOCUS TIMER
+        // ---------------------------------------------------------
+        const TIMER_MODES = {
+            focus: { seconds: 25 * 60, label: 'Focus Session', color: '#567ea2' },
+            short: { seconds: 5 * 60, label: 'Short Rest Break', color: '#547e69' },
+            long: { seconds: 15 * 60, label: 'Long Rest Break', color: '#436487' }
+        };
+
+        let currentTimerMode = 'focus';
+        let timeLeft = TIMER_MODES.focus.seconds;
+        let timerInterval = null;
+        let isTimerRunning = false;
+        let completedPomodoros = parseInt(localStorage.getItem('db_pomodoros') || '0', 10);
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const secs = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').textContent = `${mins}:${secs}`;
+
+            const totalSeconds = TIMER_MODES[currentTimerMode].seconds;
+            const circumference = 389.55; // 2 * PI * 62
+            const progress = (totalSeconds - timeLeft) / totalSeconds;
+            const offset = circumference * progress;
+
+            const ring = document.getElementById('timer-progress-ring');
+            ring.style.strokeDashoffset = offset;
+            ring.style.stroke = TIMER_MODES[currentTimerMode].color;
+        }
+
+        function setTimerMode(mode) {
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+            }
+            currentTimerMode = mode;
+            timeLeft = TIMER_MODES[mode].seconds;
+
+            // Update tab button styling
+            ['focus', 'short', 'long'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                if (m === mode) {
+                    btn.className = 'timer-mode-btn py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold bg-white text-sage-900 shadow-sm transition-all';
+                } else {
+                    btn.className = 'timer-mode-btn py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold text-sage-700 hover:text-sage-900 transition-all';
+                }
+            });
+
+            document.getElementById('timer-status-text').textContent = `Ready • ${TIMER_MODES[mode].label}`;
+            document.getElementById('timer-toggle-label').textContent = mode === 'focus' ? 'Start Focus' : 'Start Break';
+            updateTimerDisplay();
+        }
+
+        function toggleTimer() {
+            const labelEl = document.getElementById('timer-toggle-label');
+            const statusEl = document.getElementById('timer-status-text');
+
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                labelEl.textContent = 'Resume';
+                statusEl.textContent = 'Paused';
+            } else {
+                isTimerRunning = true;
+                labelEl.textContent = 'Pause';
+                statusEl.textContent = currentTimerMode === 'focus' ? 'Deep Focus Active...' : 'Resting Mindfully...';
+
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        playGentleChime();
+
+                        if (currentTimerMode === 'focus') {
+                            completedPomodoros++;
+                            localStorage.setItem('db_pomodoros', completedPomodoros.toString());
+                            document.getElementById('completed-pomodoros').textContent = completedPomodoros;
+                            showToast('Focus session complete! Take a mindful screen break.');
+                        } else {
+                            showToast('Break finished! Ready when you are.');
+                        }
+
+                        labelEl.textContent = 'Start Again';
+                        statusEl.textContent = 'Completed';
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timeLeft = TIMER_MODES[currentTimerMode].seconds;
+            document.getElementById('timer-toggle-label').textContent = currentTimerMode === 'focus' ? 'Start Focus' : 'Start Break';
+            document.getElementById('timer-status-text').textContent = `Ready • ${TIMER_MODES[currentTimerMode].label}`;
+            updateTimerDisplay();
+        }
+
+        // ---------------------------------------------------------
+        // 5. PAGE 3: GUIDED 4-7-8 BREATHING EXERCISE
+        // ---------------------------------------------------------
+        let breathingActive = false;
+        let breathTimeout = null;
+        let breathCountdownInterval = null;
+        let breathCycles = 0;
+
+        function toggleBreathing() {
+            if (breathingActive) {
+                stopBreathing();
+            } else {
+                startBreathing();
+            }
+        }
+
+        function startBreathing() {
+            breathingActive = true;
+            document.getElementById('breath-toggle-label').textContent = 'Stop Exercise';
+            runBreathPhase('inhale');
+        }
+
+        function stopBreathing() {
+            breathingActive = false;
+            clearTimeout(breathTimeout);
+            clearInterval(breathCountdownInterval);
+
+            const orb = document.getElementById('breathing-orb');
+            orb.style.transitionDuration = '0.6s';
+            orb.style.transform = 'scale(1)';
+            orb.style.backgroundColor = 'rgba(116, 155, 135, 0.9)';
+
+            document.getElementById('breath-phase-label').textContent = 'Ready';
+            document.getElementById('breath-countdown').textContent = 'Press Start';
+            document.getElementById('breath-toggle-label').textContent = 'Begin 4-7-8 Cycle';
+            document.getElementById('breath-instruction-text').textContent = 'Find a comfortable posture and soften your gaze.';
+        }
+
+        function runBreathPhase(phase) {
+            if (!breathingActive) return;
+
+            const orb = document.getElementById('breathing-orb');
+            const phaseLabel = document.getElementById('breath-phase-label');
+            const countdownEl = document.getElementById('breath-countdown');
+            const instructionEl = document.getElementById('breath-instruction-text');
+
+            clearInterval(breathCountdownInterval);
+
+            if (phase === 'inhale') {
+                // 4 seconds inhale
+                let sec = 4;
+                orb.style.transitionDuration = '4s';
+                orb.style.transform = 'scale(1.65)';
+                orb.style.backgroundColor = '#547e69'; // Deep Sage
+                phaseLabel.textContent = 'Inhale';
+                countdownEl.textContent = `${sec}s`;
+                instructionEl.textContent = 'Breathe in quietly through your nose...';
+
+                breathCountdownInterval = setInterval(() => {
+                    sec--;
+                    if (sec > 0) countdownEl.textContent = `${sec}s`;
+                }, 1000);
+
+                breathTimeout = setTimeout(() => runBreathPhase('hold'), 4000);
+
+            } else if (phase === 'hold') {
+                // 7 seconds hold
+                let sec = 7;
+                orb.style.transitionDuration = '0.5s';
+                orb.style.transform = 'scale(1.65)';
+                orb.style.backgroundColor = '#567ea2'; // Calm Slate Blue
+                phaseLabel.textContent = 'Hold';
+                countdownEl.textContent = `${sec}s`;
+                instructionEl.textContent = 'Hold your breath gently without tension...';
+
+                breathCountdownInterval = setInterval(() => {
+                    sec--;
+                    if (sec > 0) countdownEl.textContent = `${sec}s`;
+                }, 1000);
+
+                breathTimeout = setTimeout(() => runBreathPhase('exhale'), 7000);
+
+            } else if (phase === 'exhale') {
+                // 8 seconds exhale
+                let sec = 8;
+                orb.style.transitionDuration = '8s';
+                orb.style.transform = 'scale(1)';
+                orb.style.backgroundColor = '#749b87'; // Soft Sage
+                phaseLabel.textContent = 'Exhale';
+                countdownEl.textContent = `${sec}s`;
+                instructionEl.textContent = 'Exhale slowly and completely through your mouth...';
+
+                breathCountdownInterval = setInterval(() => {
+                    sec--;
+                    if (sec > 0) countdownEl.textContent = `${sec}s`;
+                }, 1000);
+
+                breathTimeout = setTimeout(() => {
+                    breathCycles++;
+                    document.getElementById('breath-cycles-count').textContent = breathCycles;
+                    runBreathPhase('inhale');
+                }, 8000);
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 6. PAGE 4: DIGITAL BALANCE SELF-ASSESSMENT QUIZ
+        // ---------------------------------------------------------
+        const quizQuestions = [
+            {
+                id: 'q1',
+                question: '1. How soon after waking up do you check your phone or screens?',
+                options: [
+                    { text: 'Within the first 5 minutes while still in bed', points: 1 },
+                    { text: 'Within 15–30 minutes during my morning routine', points: 2 },
+                    { text: 'After 30–60 minutes of offline morning time', points: 3 },
+                    { text: 'More than an hour after waking up', points: 4 }
+                ]
+            },
+            {
+                id: 'q2',
+                question: '2. How often do notifications interrupt your work or conversations?',
+                options: [
+                    { text: 'Constantly—all alerts and banners are turned on', points: 1 },
+                    { text: 'Frequently, though I occasionally silence my phone', points: 2 },
+                    { text: 'Rarely—only calls and key messages come through', points: 3 },
+                    { text: 'Almost never—I use scheduled Focus modes daily', points: 4 }
+                ]
+            },
+            {
+                id: 'q3',
+                question: '3. How does evening screen use affect your sleep wind-down?',
+                options: [
+                    { text: 'I often scroll right until I fall asleep and lose track of time', points: 1 },
+                    { text: 'I watch or scroll in bed, sometimes feeling wired afterward', points: 2 },
+                    { text: 'I put screens away 30 minutes before sleep most nights', points: 3 },
+                    { text: 'I keep a strict 60-minute screen curfew and charge outside my room', points: 4 }
+                ]
+            },
+            {
+                id: 'q4',
+                question: '4. When you feel bored or stressed for a spare moment, what is your reflex?',
+                options: [
+                    { text: 'Automatically unlock my phone and open social feeds', points: 1 },
+                    { text: 'Check messages or news headlines out of habit', points: 2 },
+                    { text: 'Pause, take a breath, and decide if I truly need my device', points: 3 },
+                    { text: 'Look around, stretch, or enjoy a quiet moment screen-free', points: 4 }
+                ]
+            },
+            {
+                id: 'q5',
+                question: '5. How intentionally do you spend your weekend free time?',
+                options: [
+                    { text: 'A large portion disappears into passive scrolling or streaming', points: 1 },
+                    { text: 'Mixed—I get outside, but still check work/social apps often', points: 2 },
+                    { text: 'I plan offline hobbies and leave my phone in another room', points: 3 },
+                    { text: 'I regularly enjoy full half-day or full-day digital detoxes', points: 4 }
+                ]
+            }
+        ];
+
+        let quizAnswers = {};
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q) => {
+                const block = document.createElement('div');
+                block.className = 'space-y-3';
+
+                const optionsHtml = q.options.map((opt, idx) => {
+                    const isSelected = quizAnswers[q.id] === opt.points;
+                    return `
+                        <button type="button" onclick="selectQuizOption('${q.id}', ${opt.points})"
+                            class="w-full text-left p-4 rounded-2xl border text-sm transition-all flex items-center justify-between gap-3 ${
+                                isSelected
+                                    ? 'bg-sage-100 border-sage-500 text-sage-900 font-semibold shadow-xs'
+                                    : 'bg-sand-50/70 border-sage-200/80 text-sage-800 hover:bg-sand-100'
+                            }">
+                            <span>${opt.text}</span>
+                            <span class="w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
+                                isSelected ? 'border-sage-600 bg-sage-600 text-white' : 'border-sage-300'
+                            }">
+                                ${isSelected ? '<span class="w-2 h-2 rounded-full bg-white"></span>' : ''}
+                            </span>
+                        </button>
+                    `;
+                }).join('');
+
+                block.innerHTML = `
+                    <h3 class="font-display font-bold text-base sm:text-lg text-sage-900">${q.question}</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        ${optionsHtml}
+                    </div>
+                `;
+                container.appendChild(block);
+            });
+
+            const answeredCount = Object.keys(quizAnswers).length;
+            document.getElementById('quiz-progress-badge').textContent = `${answeredCount} / 5 Answered`;
+        }
+
+        function selectQuizOption(questionId, points) {
+            quizAnswers[questionId] = points;
+            renderQuiz();
+        }
+
+        function evaluateQuiz() {
+            const answeredCount = Object.keys(quizAnswers).length;
+            if (answeredCount < quizQuestions.length) {
+                showToast(`Please answer all 5 questions (${answeredCount}/5 completed).`, 'info');
+                return;
+            }
+
+            const totalScore = Object.values(quizAnswers).reduce((sum, val) => sum + val, 0);
+            const resultPanel = document.getElementById('quiz-result-panel');
+            const tierEl = document.getElementById('quiz-result-tier');
+            const scoreEl = document.getElementById('quiz-result-score');
+            const summaryEl = document.getElementById('quiz-result-summary');
+            const recEl = document.getElementById('quiz-result-recommendation');
+
+            scoreEl.textContent = `${totalScore} / 20`;
+
+            if (totalScore <= 9) {
+                tierEl.textContent = 'Overstimulated & Ready for Relief';
+                summaryEl.textContent = 'Your devices are currently capturing a large share of your waking attention and rest windows. You are not alone—modern apps are built for continuous engagement, and small structural boundaries can quickly restore your energy.';
+                recEl.textContent = 'Start with two gentle shifts: charge your phone outside the bedroom tonight, and schedule a 3-hour screen-free block in the Weekend Detox Planner below.';
+            } else if (totalScore <= 15) {
+                tierEl.textContent = 'Conscious Explorer';
+                summaryEl.textContent = 'You already have healthy awareness around screen habits, though reactive check-ins still sneak into transitions and evenings. Refining a few key routines will unlock deeper focus and calmer rest.';
+                recEl.textContent = 'Try enabling Grayscale Mode after 8 PM and using our 25-minute Pomodoro timer on the Focus page for your most important daily task.';
+            } else {
+                tierEl.textContent = 'Intentional Digital Steward';
+                summaryEl.textContent = 'You maintain strong, restorative boundaries with technology. You treat devices as purposeful tools while protecting your sleep, presence, and deep focus.';
+                recEl.textContent = 'Keep nurturing your analog rituals! Use the Weekend Detox Builder below to design a creative or nature-filled weekend adventure.';
+            }
+
+            resultPanel.classList.remove('hidden');
+            resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            showToast('Your Digital Balance assessment is ready!');
+        }
+
+        function resetQuiz() {
+            quizAnswers = {};
+            document.getElementById('quiz-result-panel').classList.add('hidden');
+            renderQuiz();
+        }
+
+        // ---------------------------------------------------------
+        // 7. PAGE 4: WEEKEND DETOX PLAN BUILDER
+        // ---------------------------------------------------------
+        const curatedOfflineActivities = [
+            { title: 'Morning Nature Walk (No Phone)', category: 'Outdoors', duration: '45 mins' },
+            { title: 'Slow Coffee & Paper Book Reading', category: 'Rest', duration: '1 hour' },
+            { title: 'Cook a Recipe From Scratch', category: 'Mindful Craft', duration: '1.5 hours' },
+            { title: 'Handwritten Journaling & Reflection', category: 'Clarity', duration: '30 mins' },
+            { title: 'Visit Local Farmers Market', category: 'Community', duration: '1.5 hours' },
+            { title: 'Board Game or Card Night', category: 'Connection', duration: '2 hours' },
+            { title: 'Watercolor Sketching or Collage', category: 'Creativity', duration: '1 hour' },
+            { title: 'Sunset Stretching & Herbal Tea', category: 'Sleep Prep', duration: '40 mins' }
+        ];
+
+        let selectedDetoxDay = 'Saturday';
+        let detoxSchedule = JSON.parse(localStorage.getItem('db_detox_plan')) || {
+            Saturday: [
+                { title: 'Slow Coffee & Paper Book Reading', duration: '1 hour' },
+                { title: 'Morning Nature Walk (No Phone)', duration: '45 mins' }
+            ],
+            Sunday: [
+                { title: 'Cook a Recipe From Scratch', duration: '1.5 hours' },
+                { title: 'Sunset Stretching & Herbal Tea', duration: '40 mins' }
+            ]
+        };
+
+        function setDetoxDay(day) {
+            selectedDetoxDay = day;
+            const satBtn = document.getElementById('btn-day-sat');
+            const sunBtn = document.getElementById('btn-day-sun');
+
+            if (day === 'Saturday') {
+                satBtn.className = 'flex-1 py-2 px-3 rounded-xl text-sm font-semibold bg-white text-sage-900 shadow-sm transition-all';
+                sunBtn.className = 'flex-1 py-2 px-3 rounded-xl text-sm font-semibold text-sage-700 hover:text-sage-900 transition-all';
+            } else {
+                sunBtn.className = 'flex-1 py-2 px-3 rounded-xl text-sm font-semibold bg-white text-sage-900 shadow-sm transition-all';
+                satBtn.className = 'flex-1 py-2 px-3 rounded-xl text-sm font-semibold text-sage-700 hover:text-sage-900 transition-all';
+            }
+        }
+
+        function renderDetoxLibrary() {
+            const libEl = document.getElementById('detox-activity-library');
+            libEl.innerHTML = '';
+
+            curatedOfflineActivities.forEach(act => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => addDetoxActivity(act.title, act.duration);
+                btn.className = 'text-left p-3.5 rounded-2xl bg-sand-50 hover:bg-sage-50 border border-sage-200/80 hover:border-sage-400 transition-all group flex flex-col justify-between';
+                btn.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slatecalm-600">${act.category}</span>
+                        <span class="text-[11px] text-sage-500">${act.duration}</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-sm font-semibold text-sage-900 group-hover:text-sage-700">${act.title}</span>
+                        <span class="w-6 h-6 rounded-lg bg-white border border-sage-200 flex items-center justify-center text-sage-700 group-hover:bg-sage-600 group-hover:text-white transition-colors shrink-0">+</span>
+                    </div>
+                `;
+                libEl.appendChild(btn);
+            });
+        }
+
+        function addDetoxActivity(title, duration = 'Offline Block') {
+            detoxSchedule[selectedDetoxDay].push({ title, duration });
+            renderDetoxSchedule();
+            showToast(`Added "${title}" to ${selectedDetoxDay}.`);
+        }
+
+        function addCustomDetoxActivity() {
+            const input = document.getElementById('custom-detox-input');
+            const val = input.value.trim();
+            if (!val) {
+                showToast('Please enter an offline activity first.', 'info');
+                return;
+            }
+            addDetoxActivity(val, 'Custom Ritual');
+            input.value = '';
+        }
+
+        function removeDetoxActivity(day, index) {
+            detoxSchedule[day].splice(index, 1);
+            renderDetoxSchedule();
+        }
+
+        function renderDetoxSchedule() {
+            ['Saturday', 'Sunday'].forEach(day => {
+                const listEl = document.getElementById(`${day.toLowerCase()}-plan-list`);
+                const items = detoxSchedule[day];
+
+                if (items.length === 0) {
+                    listEl.innerHTML = `
+                        <li class="text-xs text-sage-500 italic bg-white/60 border border-dashed border-sage-200 rounded-xl p-3">
+                            No offline activities added for ${day} yet. Select one on the left!
+                        </li>
+                    `;
+                    return;
+                }
+
+                listEl.innerHTML = items.map((item, idx) => `
+                    <li class="flex items-center justify-between gap-3 bg-white p-3 rounded-xl border border-sage-200/80 shadow-2xs">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xs font-bold text-sage-500 w-5">${idx + 1}.</span>
+                            <span class="text-sm font-medium text-sage-900">${item.title}</span>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-xs text-sage-600 bg-sand-100 px-2.5 py-1 rounded-lg">${item.duration}</span>
+                            <button onclick="removeDetoxActivity('${day}', ${idx})" class="no-print text-sage-400 hover:text-red-600 p-1 rounded-lg transition-colors" aria-label="Remove item">
+                                &times;
+                            </button>
+                        </div>
+                    </li>
+                `).join('');
+            });
+        }
+
+        function saveDetoxPlan() {
+            localStorage.setItem('db_detox_plan', JSON.stringify(detoxSchedule));
+            showToast('Your Weekend Digital Detox Plan has been saved!');
+        }
+
+        function clearDetoxPlan() {
+            detoxSchedule = { Saturday: [], Sunday: [] };
+            localStorage.setItem('db_detox_plan', JSON.stringify(detoxSchedule));
+            renderDetoxSchedule();
+            showToast('Weekend schedule cleared.');
+        }
+
+        // ---------------------------------------------------------
+        // 8. INITIALIZE APPLICATION ON LOAD
+        // ---------------------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            // Initialize Lucide icons
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+
+            // Initialize Page 2 Habits
+            renderHabits();
+
+            // Initialize Page 3 Timer
+            document.getElementById('completed-pomodoros').textContent = completedPomodoros;
+            updateTimerDisplay();
+
+            // Initialize Page 4 Quiz & Detox Planner
+            renderQuiz();
+            renderDetoxLibrary();
+            renderDetoxSchedule();
+
+            // Support Enter key on custom detox input
+            const customInput = document.getElementById('custom-detox-input');
+            if (customInput) {
+                customInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addCustomDetoxActivity();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
